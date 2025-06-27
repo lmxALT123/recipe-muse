@@ -71,7 +71,7 @@ serve(async (req) => {
         JSON.stringify({ 
           error: "Sorry, I'm an AI built specifically for recipes and cooking. I can't assist you with that. Please ask me about food recipes, cooking techniques, or ingredients instead!" 
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -94,7 +94,7 @@ serve(async (req) => {
         JSON.stringify({ 
           error: "I can only help with recipes and cooking! Please ask me about food recipes, cooking techniques, or ingredients." 
         }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -202,7 +202,7 @@ CRITICAL: You MUST respond with ONLY a valid JSON object for recipe requests. Fo
             JSON.stringify({ 
               error: "Sorry, I'm an AI built specifically for recipes and cooking. I can't assist you with that. Please ask me about food recipes, cooking techniques, or ingredients instead!" 
             }),
-            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+            { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
           );
         }
 
