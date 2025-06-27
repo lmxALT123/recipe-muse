@@ -23,6 +23,7 @@ interface Recipe {
   prompt: string;
   cooking_type: 'normal' | 'long';
   created_at?: string;
+  cuisine_style?: string;
 }
 
 export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
@@ -43,28 +44,69 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
     setIsGenerating(true);
 
-    // Simulate AI processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+      console.log('Generating recipe with AI for prompt:', prompt);
+      
+      const { data, error } = await supabase.functions.invoke('generate-recipe', {
+        body: {
+          prompt: prompt.trim(),
+          cookingTime: cookingTime
+        }
+      });
 
-    // Generate a creative recipe based on the prompt
-    const recipe: Recipe = {
-      title: generateTitle(prompt),
-      cooking_time: cookingTime === 'normal' ? `${Math.floor(Math.random() * 25) + 15} minutes` : `${Math.floor(Math.random() * 3) + 1} hour${Math.random() > 0.5 ? 's' : ''}`,
-      serving_size: `${Math.floor(Math.random() * 3) + 2}-${Math.floor(Math.random() * 3) + 4} people`,
-      ingredients: generateIngredients(prompt),
-      instructions: generateInstructions(prompt),
-      cooking_tips: generateTips(prompt).join('. '),
-      prompt: prompt,
-      cooking_type: cookingTime
-    };
+      if (error) {
+        console.error('Supabase function error:', error);
+        toast({
+          title: "Error generating recipe",
+          description: "Failed to connect to AI service. Please try again.",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    setCurrentRecipe(recipe);
-    setIsGenerating(false);
+      if (!data?.recipe) {
+        console.error('No recipe data received:', data);
+        toast({
+          title: "Error generating recipe",
+          description: "Received invalid response from AI service.",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    toast({
-      title: "Recipe generated!",
-      description: "Your delicious recipe is ready to cook.",
-    });
+      const aiRecipe = data.recipe;
+      
+      // Create recipe object with AI-generated data
+      const recipe: Recipe = {
+        title: aiRecipe.title || 'Generated Recipe',
+        cooking_time: aiRecipe.cooking_time || '30 minutes',
+        serving_size: aiRecipe.serving_size || '4 people',
+        ingredients: Array.isArray(aiRecipe.ingredients) ? aiRecipe.ingredients : [],
+        instructions: Array.isArray(aiRecipe.instructions) ? aiRecipe.instructions : [],
+        cooking_tips: aiRecipe.cooking_tips || 'Enjoy your cooking!',
+        prompt: prompt,
+        cooking_type: cookingTime,
+        cuisine_style: aiRecipe.cuisine_style || 'International'
+      };
+
+      console.log('Generated recipe:', recipe);
+      setCurrentRecipe(recipe);
+
+      toast({
+        title: "Recipe generated!",
+        description: "Your AI-powered recipe is ready to cook.",
+      });
+
+    } catch (error) {
+      console.error('Error generating recipe:', error);
+      toast({
+        title: "Error generating recipe",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const saveRecipe = async () => {
@@ -83,6 +125,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
           instructions: currentRecipe.instructions,
           cooking_tips: currentRecipe.cooking_tips,
           cooking_type: currentRecipe.cooking_type,
+          cuisine_style: currentRecipe.cuisine_style,
           is_saved: true
         });
 
