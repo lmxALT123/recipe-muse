@@ -2,7 +2,7 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'app.lovable.881add2f83c84dc1904f25f82ff919f5',
+  appId: 'app.lovable.recipemuse',
   appName: 'RecipeMuse',
   webDir: 'dist',
   bundledWebRuntime: false,
