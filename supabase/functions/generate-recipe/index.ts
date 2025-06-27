@@ -38,8 +38,10 @@ serve(async (req) => {
       );
     }
 
-    // Sanitize and validate prompt
+    // Enhanced content filtering
     const sanitizedPrompt = prompt.trim().toLowerCase();
+    
+    // Forbidden keywords that are clearly not food-related
     const forbiddenKeywords = ['bomb', 'explosive', 'weapon', 'drug', 'poison'];
     
     if (forbiddenKeywords.some(keyword => sanitizedPrompt.includes(keyword))) {
@@ -49,21 +51,73 @@ serve(async (req) => {
       );
     }
 
+    // Check for obvious non-recipe requests
+    const nonRecipePatterns = [
+      /^\d+[\s]*[\+\-\*\/]\s*\d+/,  // Math operations like "2+2", "10-5"
+      /what is \d+/,                // "what is 2+2"
+      /solve|calculate|math|equation/,
+      /tell me about|who is|what is.*(?!recipe|food|cooking|ingredient)/,
+      /weather|time|date|today/,
+      /how old|when was.*born/,
+      /capital of|country|president/,
+      /programming|code|javascript|python/,
+      /movie|song|book|game/,
+    ];
+
+    const isNonRecipeRequest = nonRecipePatterns.some(pattern => pattern.test(sanitizedPrompt));
+    
+    if (isNonRecipeRequest) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Sorry, I'm an AI built specifically for recipes and cooking. I can't assist you with that. Please ask me about food recipes, cooking techniques, or ingredients instead!" 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check if the prompt contains any food-related keywords
+    const foodKeywords = [
+      'recipe', 'cook', 'bake', 'fry', 'grill', 'roast', 'steam', 'boil',
+      'ingredient', 'spice', 'seasoning', 'sauce', 'soup', 'salad', 'pasta',
+      'chicken', 'beef', 'pork', 'fish', 'vegetable', 'fruit', 'cheese',
+      'bread', 'rice', 'noodle', 'curry', 'stir', 'marinade', 'dessert',
+      'breakfast', 'lunch', 'dinner', 'snack', 'appetizer', 'main course',
+      'side dish', 'meal', 'dish', 'food', 'cuisine', 'flavor', 'taste',
+      'oven', 'pan', 'pot', 'kitchen', 'prepare', 'serve', 'eat', 'delicious'
+    ];
+
+    const containsFoodKeywords = foodKeywords.some(keyword => sanitizedPrompt.includes(keyword));
+    
+    if (!containsFoodKeywords && sanitizedPrompt.length > 10) {
+      // If it's a longer request without food keywords, it's likely not recipe-related
+      return new Response(
+        JSON.stringify({ 
+          error: "I can only help with recipes and cooking! Please ask me about food recipes, cooking techniques, or ingredients." 
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const timeConstraint = cookingTime === 'long' ? 
       'The recipe should take 1-3 hours to prepare and cook.' : 
       'The recipe should take 15-45 minutes to prepare and cook.';
 
-    const systemPrompt = `You are a professional chef and recipe creator. Create a detailed, practical recipe based on the user's request. 
+    const systemPrompt = `You are a professional chef and recipe creator. You ONLY help with recipes and cooking-related topics.
 
-Requirements:
+IMPORTANT RULES:
+- If the user asks ANYTHING that is not related to food, recipes, cooking, ingredients, or kitchen techniques, you MUST respond with: "Sorry, I'm an AI built specifically for recipes and cooking. I can't assist you with that. Please ask me about food recipes, cooking techniques, or ingredients instead!"
+- Do NOT answer math questions, general knowledge questions, or any non-food topics
+- ONLY respond to requests about recipes, cooking methods, ingredients, food preparation, or culinary techniques
+- If unsure whether a request is food-related, err on the side of caution and decline
+
+For valid recipe requests:
 - ${timeConstraint}
 - Provide realistic cooking times and serving sizes
 - Include practical cooking tips
 - Use common ingredients when possible
 - Make instructions clear and step-by-step
-- ONLY respond with food recipes - refuse any non-food requests
 
-CRITICAL: You MUST respond with ONLY a valid JSON object. Do not include any markdown formatting, explanations, or other text. Return EXACTLY this structure:
+CRITICAL: You MUST respond with ONLY a valid JSON object for recipe requests. For non-recipe requests, respond with the rejection message above. Return EXACTLY this structure for recipes:
 
 {
   "title": "Recipe Name",
@@ -141,6 +195,16 @@ CRITICAL: You MUST respond with ONLY a valid JSON object. Do not include any mar
         }
 
         console.log(`Gemini response (attempt ${attempt}):`, generatedContent);
+
+        // Check if AI declined the request
+        if (generatedContent.includes("Sorry, I'm an AI built specifically for recipes")) {
+          return new Response(
+            JSON.stringify({ 
+              error: "Sorry, I'm an AI built specifically for recipes and cooking. I can't assist you with that. Please ask me about food recipes, cooking techniques, or ingredients instead!" 
+            }),
+            { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+          );
+        }
 
         // Enhanced JSON parsing with multiple fallback strategies
         let recipe;
