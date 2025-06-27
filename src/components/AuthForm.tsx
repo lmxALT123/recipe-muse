@@ -98,7 +98,7 @@ export const AuthForm = () => {
             <ChefHat className="w-8 h-8 text-white" />
           </div>
           <CardTitle className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
-            AI Recipe Generator
+            RecipeMuse
           </CardTitle>
           <CardDescription className="text-gray-600">
             {isLogin ? 'Welcome back! Sign in to continue cooking.' : 'Create your account and start cooking amazing recipes.'}
