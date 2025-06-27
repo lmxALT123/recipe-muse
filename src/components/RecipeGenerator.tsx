@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
-import { Clock, Users, ChefHat, Heart, Sparkles } from 'lucide-react';
+import { Clock, Users, ChefHat, Heart, Sparkles, RefreshCw } from 'lucide-react';
 import { User } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -31,8 +31,9 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [cookingTime, setCookingTime] = useState<'normal' | 'long'>('normal');
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
+  const [retryCount, setRetryCount] = useState(0);
 
-  const generateRecipe = async () => {
+  const generateRecipe = async (isRetry = false) => {
     if (!prompt.trim()) {
       toast({
         title: "Please enter a recipe request",
@@ -43,9 +44,17 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
     }
 
     setIsGenerating(true);
+    
+    if (!isRetry) {
+      setRetryCount(0);
+    }
 
     try {
       console.log('Generating recipe with AI for prompt:', prompt);
+      
+      // Add a longer timeout for the request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
       
       const { data, error } = await supabase.functions.invoke('generate-recipe', {
         body: {
@@ -54,11 +63,25 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
         }
       });
 
+      clearTimeout(timeoutId);
+
       if (error) {
         console.error('Supabase function error:', error);
+        
+        // Check if it's a network/timeout error and suggest retry
+        if (error.message?.includes('timeout') || error.message?.includes('network') || error.status >= 500) {
+          toast({
+            title: "Connection issue",
+            description: "The AI service is taking longer than usual. Click 'Retry' to try again.",
+            variant: "destructive"
+          });
+          setRetryCount(prev => prev + 1);
+          return;
+        }
+        
         toast({
           title: "Error generating recipe",
-          description: "Failed to connect to AI service. Please try again.",
+          description: error.message || "Failed to connect to AI service. Please try again.",
           variant: "destructive"
         });
         return;
@@ -66,11 +89,15 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
       if (!data?.recipe) {
         console.error('No recipe data received:', data);
+        
+        // Show specific error message if available
+        const errorMessage = data?.error || "Received invalid response from AI service.";
         toast({
           title: "Error generating recipe",
-          description: "Received invalid response from AI service.",
+          description: errorMessage,
           variant: "destructive"
         });
+        setRetryCount(prev => prev + 1);
         return;
       }
 
@@ -91,6 +118,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
       console.log('Generated recipe:', recipe);
       setCurrentRecipe(recipe);
+      setRetryCount(0); // Reset retry count on success
 
       toast({
         title: "Recipe generated!",
@@ -99,14 +127,32 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
     } catch (error) {
       console.error('Error generating recipe:', error);
-      toast({
-        title: "Error generating recipe",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive"
-      });
+      
+      const isNetworkError = error.name === 'AbortError' || 
+                           error.message?.includes('fetch') || 
+                           error.message?.includes('network');
+      
+      if (isNetworkError) {
+        toast({
+          title: "Connection timeout",
+          description: "The request took too long. Please try again.",
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Error generating recipe",
+          description: "Something went wrong. Please try again.",
+          variant: "destructive"
+        });
+      }
+      setRetryCount(prev => prev + 1);
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleRetry = () => {
+    generateRecipe(true);
   };
 
   const saveRecipe = async () => {
@@ -267,9 +313,21 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               </div>
             </div>
 
-            <div className="flex-1 flex justify-end items-end">
+            <div className="flex-1 flex justify-end items-end gap-2">
+              {retryCount > 0 && (
+                <Button
+                  onClick={handleRetry}
+                  disabled={isGenerating}
+                  variant="outline"
+                  className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300"
+                >
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Retry
+                </Button>
+              )}
+              
               <Button
-                onClick={generateRecipe}
+                onClick={() => generateRecipe(false)}
                 disabled={isGenerating || !prompt.trim()}
                 className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-3 transition-all duration-200 transform hover:scale-105"
               >
@@ -287,6 +345,12 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               </Button>
             </div>
           </div>
+          
+          {retryCount > 0 && (
+            <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+              <p>Having trouble? The AI service is sometimes busy. Try the retry button or rephrase your request.</p>
+            </div>
+          )}
         </CardContent>
       </Card>
 
