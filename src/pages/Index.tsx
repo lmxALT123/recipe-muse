@@ -1,37 +1,58 @@
 
 import { useState, useEffect } from 'react';
+import { User, Session } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 import { AuthForm } from '@/components/AuthForm';
 import { RecipeGenerator } from '@/components/RecipeGenerator';
 import { Navigation } from '@/components/Navigation';
 import { SavedRecipes } from '@/components/SavedRecipes';
 
 const Index = () => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [currentView, setCurrentView] = useState('generator');
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for existing session
-    const savedUser = localStorage.getItem('cookingAppUser');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
+
+    return () => subscription.unsubscribe();
   }, []);
 
-  const handleLogin = (userData) => {
-    setUser(userData);
-    localStorage.setItem('cookingAppUser', JSON.stringify(userData));
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    localStorage.removeItem('cookingAppUser');
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     setCurrentView('generator');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 bg-orange-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50">
-        <AuthForm onLogin={handleLogin} />
+        <AuthForm />
       </div>
     );
   }

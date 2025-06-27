@@ -1,8 +1,18 @@
 
 import { Button } from '@/components/ui/button';
 import { ChefHat, BookOpen, Sparkles, LogOut, User } from 'lucide-react';
+import { User as SupabaseUser } from '@supabase/supabase-js';
 
-export const Navigation = ({ user, onLogout, currentView, onViewChange }) => {
+interface NavigationProps {
+  user: SupabaseUser;
+  onLogout: () => void;
+  currentView: string;
+  onViewChange: (view: string) => void;
+}
+
+export const Navigation = ({ user, onLogout, currentView, onViewChange }: NavigationProps) => {
+  const displayName = user.user_metadata?.full_name || user.email?.split('@')[0] || 'User';
+
   return (
     <nav className="bg-white/80 backdrop-blur-md border-b border-orange-200 shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-4">
@@ -41,7 +51,7 @@ export const Navigation = ({ user, onLogout, currentView, onViewChange }) => {
                   <User className="w-4 h-4 text-orange-600" />
                 </div>
                 <span className="text-sm text-gray-700 hidden sm:inline">
-                  {user.name}
+                  {displayName}
                 </span>
               </div>
               

@@ -9,7 +9,81 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      recipes: {
+        Row: {
+          cooking_time: string | null
+          cooking_tips: string | null
+          cooking_type: string | null
+          created_at: string
+          cuisine_style: string | null
+          description: string | null
+          id: string
+          ingredients: string[]
+          instructions: string[]
+          is_saved: boolean | null
+          serving_size: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          cooking_time?: string | null
+          cooking_tips?: string | null
+          cooking_type?: string | null
+          created_at?: string
+          cuisine_style?: string | null
+          description?: string | null
+          id?: string
+          ingredients: string[]
+          instructions: string[]
+          is_saved?: boolean | null
+          serving_size?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          cooking_time?: string | null
+          cooking_tips?: string | null
+          cooking_type?: string | null
+          created_at?: string
+          cuisine_style?: string | null
+          description?: string | null
+          id?: string
+          ingredients?: string[]
+          instructions?: string[]
+          is_saved?: boolean | null
+          serving_size?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

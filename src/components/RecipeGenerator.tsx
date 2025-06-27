@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -6,12 +5,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Clock, Users, ChefHat, Heart, Sparkles } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-export const RecipeGenerator = ({ user }) => {
+interface RecipeGeneratorProps {
+  user: User;
+}
+
+interface Recipe {
+  id?: string;
+  title: string;
+  cooking_time: string;
+  serving_size: string;
+  ingredients: string[];
+  instructions: string[];
+  cooking_tips: string;
+  prompt: string;
+  cooking_type: 'normal' | 'long';
+  created_at?: string;
+}
+
+export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   const [prompt, setPrompt] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [cookingTime, setCookingTime] = useState('normal');
-  const [currentRecipe, setCurrentRecipe] = useState(null);
+  const [cookingTime, setCookingTime] = useState<'normal' | 'long'>('normal');
+  const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
 
   const generateRecipe = async () => {
     if (!prompt.trim()) {
@@ -29,16 +47,15 @@ export const RecipeGenerator = ({ user }) => {
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     // Generate a creative recipe based on the prompt
-    const recipe = {
-      id: Date.now(),
+    const recipe: Recipe = {
       title: generateTitle(prompt),
-      cookingTime: cookingTime === 'normal' ? `${Math.floor(Math.random() * 25) + 15} minutes` : `${Math.floor(Math.random() * 3) + 1} hour${Math.random() > 0.5 ? 's' : ''}`,
-      servings: `${Math.floor(Math.random() * 3) + 2}-${Math.floor(Math.random() * 3) + 4} people`,
+      cooking_time: cookingTime === 'normal' ? `${Math.floor(Math.random() * 25) + 15} minutes` : `${Math.floor(Math.random() * 3) + 1} hour${Math.random() > 0.5 ? 's' : ''}`,
+      serving_size: `${Math.floor(Math.random() * 3) + 2}-${Math.floor(Math.random() * 3) + 4} people`,
       ingredients: generateIngredients(prompt),
       instructions: generateInstructions(prompt),
-      tips: generateTips(prompt),
-      createdAt: new Date().toISOString(),
-      prompt: prompt
+      cooking_tips: generateTips(prompt).join('. '),
+      prompt: prompt,
+      cooking_type: cookingTime
     };
 
     setCurrentRecipe(recipe);
@@ -50,20 +67,47 @@ export const RecipeGenerator = ({ user }) => {
     });
   };
 
-  const saveRecipe = () => {
-    if (!currentRecipe) return;
+  const saveRecipe = async () => {
+    if (!currentRecipe || !user) return;
 
-    const savedRecipes = JSON.parse(localStorage.getItem(`recipes_${user.id}`) || '[]');
-    savedRecipes.push({ ...currentRecipe, savedAt: new Date().toISOString() });
-    localStorage.setItem(`recipes_${user.id}`, JSON.stringify(savedRecipes));
+    try {
+      const { error } = await supabase
+        .from('recipes')
+        .insert({
+          user_id: user.id,
+          title: currentRecipe.title,
+          description: currentRecipe.prompt,
+          cooking_time: currentRecipe.cooking_time,
+          serving_size: currentRecipe.serving_size,
+          ingredients: currentRecipe.ingredients,
+          instructions: currentRecipe.instructions,
+          cooking_tips: currentRecipe.cooking_tips,
+          cooking_type: currentRecipe.cooking_type,
+          is_saved: true
+        });
 
-    toast({
-      title: "Recipe saved!",
-      description: "Added to your personal recipe collection.",
-    });
+      if (error) {
+        toast({
+          title: "Error saving recipe",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        toast({
+          title: "Recipe saved!",
+          description: "Added to your personal recipe collection.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to save recipe. Please try again.",
+        variant: "destructive"
+      });
+    }
   };
 
-  const generateTitle = (prompt) => {
+  const generateTitle = (prompt: string) => {
     const keywords = prompt.toLowerCase().split(' ');
     const proteins = ['chicken', 'beef', 'pork', 'turkey', 'fish', 'tofu'];
     const styles = ['curry', 'stir-fry', 'soup', 'salad', 'pasta', 'rice'];
@@ -83,7 +127,7 @@ export const RecipeGenerator = ({ user }) => {
     return title + ' Delight';
   };
 
-  const generateIngredients = (prompt) => {
+  const generateIngredients = (prompt: string) => {
     const baseIngredients = [
       '2 tbsp olive oil',
       '1 medium onion, diced',
@@ -104,7 +148,7 @@ export const RecipeGenerator = ({ user }) => {
     return [...baseIngredients, ...extraIngredients];
   };
 
-  const generateInstructions = (prompt) => {
+  const generateInstructions = (prompt: string) => {
     return [
       'Heat olive oil in a large pan over medium-high heat.',
       'Add diced onion and cook until translucent, about 3-4 minutes.',
@@ -118,7 +162,7 @@ export const RecipeGenerator = ({ user }) => {
     ];
   };
 
-  const generateTips = (prompt) => {
+  const generateTips = (prompt: string) => {
     const tips = [
       'For extra flavor, marinate your protein for 30 minutes before cooking.',
       'Fresh herbs added at the end will brighten up the dish.',
@@ -214,11 +258,11 @@ export const RecipeGenerator = ({ user }) => {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                     <Clock className="w-3 h-3 mr-1" />
-                    {currentRecipe.cookingTime}
+                    {currentRecipe.cooking_time}
                   </Badge>
                   <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                     <Users className="w-3 h-3 mr-1" />
-                    Serves {currentRecipe.servings}
+                    Serves {currentRecipe.serving_size}
                   </Badge>
                 </div>
               </div>
@@ -262,13 +306,7 @@ export const RecipeGenerator = ({ user }) => {
 
             <div className="bg-orange-50 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Chef's Tips</h3>
-              <ul className="space-y-1">
-                {currentRecipe.tips.map((tip, index) => (
-                  <li key={index} className="text-gray-700 text-sm">
-                    • {tip}
-                  </li>
-                ))}
-              </ul>
+              <p className="text-gray-700 text-sm">{currentRecipe.cooking_tips}</p>
             </div>
           </CardContent>
         </Card>

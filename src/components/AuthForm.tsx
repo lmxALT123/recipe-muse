@@ -6,53 +6,87 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/hooks/use-toast';
 import { ChefHat, Mail, Lock, User } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
-export const AuthForm = ({ onLogin }) => {
+export const AuthForm = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     confirmPassword: '',
-    name: ''
+    fullName: ''
   });
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    try {
+      if (!isLogin && formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords don't match",
+          variant: "destructive"
+        });
+        return;
+      }
 
-    if (!isLogin && formData.password !== formData.confirmPassword) {
+      if (isLogin) {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (error) {
+          toast({
+            title: "Login Failed",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Welcome back!",
+            description: "Successfully logged in",
+          });
+        }
+      } else {
+        const { error } = await supabase.auth.signUp({
+          email: formData.email,
+          password: formData.password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`,
+            data: {
+              full_name: formData.fullName,
+            }
+          }
+        });
+
+        if (error) {
+          toast({
+            title: "Sign Up Failed",
+            description: error.message,
+            variant: "destructive"
+          });
+        } else {
+          toast({
+            title: "Account created!",
+            description: "Please check your email to confirm your account.",
+          });
+        }
+      }
+    } catch (error) {
       toast({
         title: "Error",
-        description: "Passwords don't match",
+        description: "An unexpected error occurred",
         variant: "destructive"
       });
+    } finally {
       setIsLoading(false);
-      return;
     }
-
-    // Simulate successful authentication
-    const userData = {
-      id: Date.now(),
-      email: formData.email,
-      name: isLogin ? formData.email.split('@')[0] : formData.name,
-      loginTime: new Date().toISOString()
-    };
-
-    onLogin(userData);
-    
-    toast({
-      title: isLogin ? "Welcome back!" : "Account created!",
-      description: `Successfully ${isLogin ? 'logged in' : 'signed up'}`,
-    });
-
-    setIsLoading(false);
   };
 
-  const handleInputChange = (field, value) => {
+  const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
@@ -75,15 +109,15 @@ export const AuthForm = ({ onLogin }) => {
           <form onSubmit={handleSubmit} className="space-y-4">
             {!isLogin && (
               <div className="space-y-2">
-                <Label htmlFor="name">Full Name</Label>
+                <Label htmlFor="fullName">Full Name</Label>
                 <div className="relative">
                   <User className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
-                    id="name"
+                    id="fullName"
                     type="text"
                     placeholder="Enter your full name"
-                    value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
                     className="pl-10"
                     required
                   />
@@ -119,6 +153,7 @@ export const AuthForm = ({ onLogin }) => {
                   onChange={(e) => handleInputChange('password', e.target.value)}
                   className="pl-10"
                   required
+                  minLength={6}
                 />
               </div>
             </div>
@@ -136,6 +171,7 @@ export const AuthForm = ({ onLogin }) => {
                     onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
                     className="pl-10"
                     required
+                    minLength={6}
                   />
                 </div>
               </div>

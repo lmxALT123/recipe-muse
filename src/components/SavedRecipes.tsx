@@ -5,30 +5,108 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Clock, Users, Trash2, Heart, ChefHat } from 'lucide-react';
+import { User } from '@supabase/supabase-js';
+import { supabase } from '@/integrations/supabase/client';
 
-export const SavedRecipes = ({ user }) => {
-  const [savedRecipes, setSavedRecipes] = useState([]);
-  const [selectedRecipe, setSelectedRecipe] = useState(null);
+interface SavedRecipesProps {
+  user: User;
+}
+
+interface Recipe {
+  id: string;
+  title: string;
+  description: string;
+  cooking_time: string;
+  serving_size: string;
+  ingredients: string[];
+  instructions: string[];
+  cooking_tips: string;
+  created_at: string;
+}
+
+export const SavedRecipes = ({ user }: SavedRecipesProps) => {
+  const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
+  const [selectedRecipe, setSelectedRecipe] = useState<Recipe | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const recipes = JSON.parse(localStorage.getItem(`recipes_${user.id}`) || '[]');
-    setSavedRecipes(recipes.reverse()); // Show newest first
+    fetchSavedRecipes();
   }, [user.id]);
 
-  const deleteRecipe = (recipeId) => {
-    const updatedRecipes = savedRecipes.filter(recipe => recipe.id !== recipeId);
-    setSavedRecipes(updatedRecipes);
-    localStorage.setItem(`recipes_${user.id}`, JSON.stringify(updatedRecipes.reverse()));
-    
-    if (selectedRecipe && selectedRecipe.id === recipeId) {
-      setSelectedRecipe(null);
-    }
+  const fetchSavedRecipes = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('recipes')
+        .select('*')
+        .eq('user_id', user.id)
+        .eq('is_saved', true)
+        .order('created_at', { ascending: false });
 
-    toast({
-      title: "Recipe deleted",
-      description: "Recipe removed from your collection.",
-    });
+      if (error) {
+        toast({
+          title: "Error loading recipes",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        setSavedRecipes(data || []);
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to load saved recipes",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const deleteRecipe = async (recipeId: string) => {
+    try {
+      const { error } = await supabase
+        .from('recipes')
+        .delete()
+        .eq('id', recipeId)
+        .eq('user_id', user.id);
+
+      if (error) {
+        toast({
+          title: "Error deleting recipe",
+          description: error.message,
+          variant: "destructive"
+        });
+      } else {
+        setSavedRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
+        
+        if (selectedRecipe && selectedRecipe.id === recipeId) {
+          setSelectedRecipe(null);
+        }
+
+        toast({
+          title: "Recipe deleted",
+          description: "Recipe removed from your collection.",
+        });
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to delete recipe",
+        variant: "destructive"
+      });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center py-12">
+          <div className="w-12 h-12 bg-orange-500 rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading your recipes...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (savedRecipes.length === 0) {
     return (
@@ -41,12 +119,6 @@ export const SavedRecipes = ({ user }) => {
           <p className="text-gray-600 mb-6">
             Start generating recipes and save your favorites to build your personal cookbook!
           </p>
-          <Button
-            onClick={() => window.location.reload()}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-          >
-            Generate Your First Recipe
-          </Button>
         </div>
       </div>
     );
@@ -85,11 +157,11 @@ export const SavedRecipes = ({ user }) => {
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                         <Clock className="w-3 h-3 mr-1" />
-                        {recipe.cookingTime}
+                        {recipe.cooking_time}
                       </Badge>
                       <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                         <Users className="w-3 h-3 mr-1" />
-                        {recipe.servings}
+                        {recipe.serving_size}
                       </Badge>
                     </div>
                   </div>
@@ -108,10 +180,10 @@ export const SavedRecipes = ({ user }) => {
               </CardHeader>
               <CardContent className="pt-0">
                 <p className="text-sm text-gray-600 line-clamp-2">
-                  Original request: "{recipe.prompt}"
+                  Original request: "{recipe.description}"
                 </p>
                 <p className="text-xs text-gray-400 mt-2">
-                  Saved {new Date(recipe.savedAt).toLocaleDateString()}
+                  Saved {new Date(recipe.created_at).toLocaleDateString()}
                 </p>
               </CardContent>
             </Card>
@@ -131,11 +203,11 @@ export const SavedRecipes = ({ user }) => {
                     <div className="flex flex-wrap gap-2">
                       <Badge variant="secondary" className="bg-orange-100 text-orange-700">
                         <Clock className="w-3 h-3 mr-1" />
-                        {selectedRecipe.cookingTime}
+                        {selectedRecipe.cooking_time}
                       </Badge>
                       <Badge variant="secondary" className="bg-blue-100 text-blue-700">
                         <Users className="w-3 h-3 mr-1" />
-                        Serves {selectedRecipe.servings}
+                        Serves {selectedRecipe.serving_size}
                       </Badge>
                     </div>
                   </div>
@@ -172,13 +244,7 @@ export const SavedRecipes = ({ user }) => {
 
                 <div className="bg-orange-50 p-4 rounded-lg">
                   <h3 className="text-lg font-semibold text-gray-800 mb-2">Chef's Tips</h3>
-                  <ul className="space-y-1">
-                    {selectedRecipe.tips.map((tip, index) => (
-                      <li key={index} className="text-gray-700 text-sm">
-                        • {tip}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="text-gray-700 text-sm">{selectedRecipe.cooking_tips}</p>
                 </div>
               </CardContent>
             </Card>
