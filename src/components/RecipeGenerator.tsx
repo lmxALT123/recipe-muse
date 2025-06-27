@@ -32,6 +32,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   const [cookingTime, setCookingTime] = useState<'normal' | 'long'>('normal');
   const [currentRecipe, setCurrentRecipe] = useState<Recipe | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [isNonRecipeError, setIsNonRecipeError] = useState(false);
 
   const generateRecipe = async (isRetry = false) => {
     if (!prompt.trim()) {
@@ -47,6 +48,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
     
     if (!isRetry) {
       setRetryCount(0);
+      setIsNonRecipeError(false);
     }
 
     try {
@@ -76,6 +78,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             variant: "destructive"
           });
           setRetryCount(prev => prev + 1);
+          setIsNonRecipeError(false);
           return;
         }
         
@@ -90,14 +93,24 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
       if (!data?.recipe) {
         console.error('No recipe data received:', data);
         
-        // Show specific error message if available
+        // Check if it's a non-recipe error message
         const errorMessage = data?.error || "Received invalid response from AI service.";
+        const isNonRecipeRequest = errorMessage.includes("I'm an AI built specifically for recipes") || 
+                                   errorMessage.includes("I can only help with recipes and cooking");
+        
+        if (isNonRecipeRequest) {
+          setIsNonRecipeError(true);
+          setRetryCount(0); // Don't show retry for non-recipe requests
+        } else {
+          setIsNonRecipeError(false);
+          setRetryCount(prev => prev + 1);
+        }
+        
         toast({
-          title: "Error generating recipe",
+          title: isNonRecipeRequest ? "Invalid Request" : "Error generating recipe",
           description: errorMessage,
           variant: "destructive"
         });
-        setRetryCount(prev => prev + 1);
         return;
       }
 
@@ -119,6 +132,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
       console.log('Generated recipe:', recipe);
       setCurrentRecipe(recipe);
       setRetryCount(0); // Reset retry count on success
+      setIsNonRecipeError(false);
 
       toast({
         title: "Recipe generated!",
@@ -138,12 +152,14 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
           description: "The request took too long. Please try again.",
           variant: "destructive"
         });
+        setIsNonRecipeError(false);
       } else {
         toast({
           title: "Error generating recipe",
           description: "Something went wrong. Please try again.",
           variant: "destructive"
         });
+        setIsNonRecipeError(false);
       }
       setRetryCount(prev => prev + 1);
     } finally {
@@ -314,7 +330,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             </div>
 
             <div className="flex-1 flex justify-end items-end gap-2">
-              {retryCount > 0 && (
+              {retryCount > 0 && !isNonRecipeError && (
                 <Button
                   onClick={handleRetry}
                   disabled={isGenerating}
@@ -346,9 +362,15 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             </div>
           </div>
           
-          {retryCount > 0 && (
+          {retryCount > 0 && !isNonRecipeError && (
             <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
               <p>Having trouble? The AI service is sometimes busy. Try the retry button or rephrase your request.</p>
+            </div>
+          )}
+          
+          {isNonRecipeError && (
+            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+              <p>Please ask me about food recipes, cooking techniques, or ingredients. I'm designed specifically to help with cooking!</p>
             </div>
           )}
         </CardContent>
