@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -51,11 +50,14 @@ export const AuthForm = () => {
           });
         }
       } else {
+        // Get the current URL origin for the redirect
+        const redirectUrl = window.location.origin;
+        
         const { error } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
-            emailRedirectTo: `${window.location.origin}/`,
+            emailRedirectTo: redirectUrl,
             data: {
               full_name: formData.fullName,
             }
@@ -71,7 +73,7 @@ export const AuthForm = () => {
         } else {
           toast({
             title: "Account created!",
-            description: "Please check your email to confirm your account.",
+            description: "Please check your email to confirm your account. The confirmation link will redirect you back to this app.",
           });
         }
       }
