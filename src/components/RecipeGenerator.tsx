@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -279,47 +280,47 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
+    <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 space-y-4 sm:space-y-6">
       {/* Header Section */}
-      <div className="text-center space-y-2">
-        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent px-4">
+      <div className="text-center space-y-1 sm:space-y-2 pt-2 sm:pt-4">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent px-2">
           What would you like to cook today?
         </h1>
-        <p className="text-gray-600 text-sm sm:text-base px-4">
+        <p className="text-gray-600 text-xs sm:text-sm md:text-base px-2">
           Describe any dish and I'll create a personalized recipe just for you!
         </p>
       </div>
 
       {/* Recipe Request Card */}
-      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="pb-4 px-4 sm:px-6">
-          <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
-            <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0" />
+      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mx-1 sm:mx-0">
+        <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6">
+          <CardTitle className="flex items-center space-x-2 text-base sm:text-lg md:text-xl">
+            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
             <span>Recipe Request</span>
           </CardTitle>
-          <CardDescription className="text-sm sm:text-base">
+          <CardDescription className="text-xs sm:text-sm md:text-base">
             Be creative! Try "spicy chicken and pineapple curry" or "quick weeknight pasta"
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-4 px-4 sm:px-6">
+        <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-4 md:px-6">
           <Textarea
             placeholder="I want to make..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[80px] sm:min-h-[100px] text-base sm:text-lg resize-none"
+            className="min-h-[70px] sm:min-h-[80px] md:min-h-[100px] text-sm sm:text-base md:text-lg resize-none"
           />
 
           {/* Cooking Time and Generate Button Section */}
-          <div className="space-y-4">
+          <div className="space-y-3 sm:space-y-4">
             {/* Cooking Time Preference */}
-            <div className="space-y-3">
-              <label className="text-sm font-medium block">Cooking Time Preference</label>
-              <div className="flex flex-col sm:flex-row gap-2">
+            <div className="space-y-2 sm:space-y-3">
+              <label className="text-xs sm:text-sm font-medium block">Cooking Time Preference</label>
+              <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant={cookingTime === 'normal' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('normal')}
-                  className={`w-full sm:w-auto text-sm ${
+                  className={`text-xs sm:text-sm h-9 sm:h-10 ${
                     cookingTime === 'normal' ? 'bg-orange-500 hover:bg-orange-600' : ''
                   }`}
                 >
@@ -328,7 +329,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
                 <Button
                   variant={cookingTime === 'long' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('long')}
-                  className={`w-full sm:w-auto text-sm ${
+                  className={`text-xs sm:text-sm h-9 sm:h-10 ${
                     cookingTime === 'long' ? 'bg-orange-500 hover:bg-orange-600' : ''
                   }`}
                 >
@@ -338,15 +339,15 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
+            <div className="flex flex-col gap-2">
               {retryCount > 0 && !isNonRecipeError && (
                 <Button
                   onClick={handleRetry}
                   disabled={isGenerating}
                   variant="outline"
-                  className="w-full sm:w-auto border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300 text-sm"
+                  className="w-full border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300 text-xs sm:text-sm h-9 sm:h-10"
                 >
-                  <RefreshCw className="w-4 h-4 mr-2 flex-shrink-0" />
+                  <RefreshCw className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                   Retry
                 </Button>
               )}
@@ -354,16 +355,16 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               <Button
                 onClick={() => generateRecipe(false)}
                 disabled={isGenerating || !prompt.trim()}
-                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-6 sm:px-8 py-3 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold transition-all duration-200 text-xs sm:text-sm md:text-base h-10 sm:h-11"
               >
                 {isGenerating ? (
                   <>
-                    <ChefHat className="w-4 h-4 mr-2 animate-spin flex-shrink-0" />
+                    <ChefHat className="w-3 h-3 sm:w-4 sm:h-4 mr-2 animate-spin flex-shrink-0" />
                     <span className="truncate">Cooking up magic...</span>
                   </>
                 ) : (
                   <>
-                    <ChefHat className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <ChefHat className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                     <span>Generate Recipe</span>
                   </>
                 )}
@@ -373,13 +374,13 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
           
           {/* Status Messages */}
           {retryCount > 0 && !isNonRecipeError && (
-            <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
+            <div className="text-xs sm:text-sm text-orange-600 bg-orange-50 p-2 sm:p-3 rounded-lg">
               <p>Having trouble? The AI service is sometimes busy. Try the retry button or rephrase your request.</p>
             </div>
           )}
           
           {isNonRecipeError && (
-            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-lg">
+            <div className="text-xs sm:text-sm text-red-600 bg-red-50 p-2 sm:p-3 rounded-lg">
               <p>Please ask me about food recipes, cooking techniques, or ingredients. I'm designed specifically to help with cooking!</p>
             </div>
           )}
@@ -388,14 +389,14 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
       {/* Generated Recipe Display */}
       {currentRecipe && (
-        <Card className="shadow-xl border-0 bg-white">
-          <CardHeader className="pb-4 px-4 sm:px-6">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+        <Card className="shadow-xl border-0 bg-white mx-1 sm:mx-0">
+          <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6">
+            <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-start sm:gap-4">
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-xl sm:text-2xl text-gray-800 mb-2 break-words">
+                <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-800 mb-2 break-words leading-tight">
                   {currentRecipe.title}
                 </CardTitle>
-                <div className="flex flex-wrap gap-2">
+                <div className="flex flex-wrap gap-1 sm:gap-2">
                   <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
                     <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
                     <span className="truncate">{currentRecipe.cooking_time}</span>
@@ -409,23 +410,23 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               <Button
                 onClick={saveRecipe}
                 variant="outline"
-                className="w-full sm:w-auto border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-sm flex-shrink-0"
+                className="w-full sm:w-auto border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs sm:text-sm flex-shrink-0 h-9 sm:h-10"
               >
-                <Heart className="w-4 h-4 mr-2 flex-shrink-0" />
+                <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 Save Recipe
               </Button>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6 px-4 sm:px-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
             {/* Ingredients Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Ingredients</h3>
-              <ul className="space-y-2">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Ingredients</h3>
+              <ul className="space-y-1 sm:space-y-2">
                 {currentRecipe.ingredients.map((ingredient, index) => (
                   <li key={index} className="flex items-start space-x-2">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
-                    <span className="text-gray-700 text-sm sm:text-base break-words">{ingredient}</span>
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-1.5 sm:mt-2 flex-shrink-0"></div>
+                    <span className="text-gray-700 text-xs sm:text-sm md:text-base break-words leading-relaxed">{ingredient}</span>
                   </li>
                 ))}
               </ul>
@@ -433,23 +434,23 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
             {/* Instructions Section */}
             <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-3">Instructions</h3>
-              <ol className="space-y-3">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Instructions</h3>
+              <ol className="space-y-2 sm:space-y-3">
                 {currentRecipe.instructions.map((step, index) => (
-                  <li key={index} className="flex space-x-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium mt-0.5">
+                  <li key={index} className="flex space-x-2 sm:space-x-3">
+                    <span className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-xs sm:text-sm font-medium mt-0.5">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700 text-sm sm:text-base break-words flex-1">{step}</span>
+                    <span className="text-gray-700 text-xs sm:text-sm md:text-base break-words flex-1 leading-relaxed">{step}</span>
                   </li>
                 ))}
               </ol>
             </div>
 
             {/* Chef's Tips Section */}
-            <div className="bg-orange-50 p-4 rounded-lg">
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">Chef's Tips</h3>
-              <p className="text-gray-700 text-sm break-words">{currentRecipe.cooking_tips}</p>
+            <div className="bg-orange-50 p-3 sm:p-4 rounded-lg">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-2">Chef's Tips</h3>
+              <p className="text-gray-700 text-xs sm:text-sm break-words leading-relaxed">{currentRecipe.cooking_tips}</p>
             </div>
           </CardContent>
         </Card>
