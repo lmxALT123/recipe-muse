@@ -40,7 +40,7 @@ const Index = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-orange-50 to-amber-50 flex items-center justify-center px-4">
         <div className="text-center">
           <div className="w-12 h-12 bg-orange-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600">Loading...</p>
@@ -66,7 +66,7 @@ const Index = () => {
         onViewChange={setCurrentView}
       />
       
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         {currentView === 'generator' && <RecipeGenerator user={user} />}
         {currentView === 'saved' && <SavedRecipes user={user} />}
       </main>

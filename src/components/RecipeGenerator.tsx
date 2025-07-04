@@ -279,65 +279,74 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-6 px-4 sm:px-6">
+      {/* Header Section */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+        <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent px-4">
           What would you like to cook today?
         </h1>
-        <p className="text-gray-600">
+        <p className="text-gray-600 text-sm sm:text-base px-4">
           Describe any dish and I'll create a personalized recipe just for you!
         </p>
       </div>
 
+      {/* Recipe Request Card */}
       <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2">
-            <Sparkles className="w-5 h-5 text-orange-500" />
+        <CardHeader className="pb-4 px-4 sm:px-6">
+          <CardTitle className="flex items-center space-x-2 text-lg sm:text-xl">
+            <Sparkles className="w-5 h-5 text-orange-500 flex-shrink-0" />
             <span>Recipe Request</span>
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm sm:text-base">
             Be creative! Try "spicy chicken and pineapple curry" or "quick weeknight pasta"
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 px-4 sm:px-6">
           <Textarea
             placeholder="I want to make..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[100px] text-lg"
+            className="min-h-[80px] sm:min-h-[100px] text-base sm:text-lg resize-none"
           />
 
-          <div className="flex flex-col sm:flex-row gap-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium">Cooking Time Preference</label>
-              <div className="flex space-x-2">
+          {/* Cooking Time and Generate Button Section */}
+          <div className="space-y-4">
+            {/* Cooking Time Preference */}
+            <div className="space-y-3">
+              <label className="text-sm font-medium block">Cooking Time Preference</label>
+              <div className="flex flex-col sm:flex-row gap-2">
                 <Button
                   variant={cookingTime === 'normal' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('normal')}
-                  className={cookingTime === 'normal' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                  className={`w-full sm:w-auto text-sm ${
+                    cookingTime === 'normal' ? 'bg-orange-500 hover:bg-orange-600' : ''
+                  }`}
                 >
                   Normal (15-30 min)
                 </Button>
                 <Button
                   variant={cookingTime === 'long' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('long')}
-                  className={cookingTime === 'long' ? 'bg-orange-500 hover:bg-orange-600' : ''}
+                  className={`w-full sm:w-auto text-sm ${
+                    cookingTime === 'long' ? 'bg-orange-500 hover:bg-orange-600' : ''
+                  }`}
                 >
                   Long (1+ hours)
                 </Button>
               </div>
             </div>
 
-            <div className="flex-1 flex justify-end items-end gap-2">
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-2 sm:justify-end">
               {retryCount > 0 && !isNonRecipeError && (
                 <Button
                   onClick={handleRetry}
                   disabled={isGenerating}
                   variant="outline"
-                  className="border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300"
+                  className="w-full sm:w-auto border-orange-200 text-orange-600 hover:bg-orange-50 hover:border-orange-300 text-sm"
                 >
-                  <RefreshCw className="w-4 h-4 mr-2" />
+                  <RefreshCw className="w-4 h-4 mr-2 flex-shrink-0" />
                   Retry
                 </Button>
               )}
@@ -345,23 +354,24 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               <Button
                 onClick={() => generateRecipe(false)}
                 disabled={isGenerating || !prompt.trim()}
-                className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-8 py-3 transition-all duration-200 transform hover:scale-105"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold px-6 sm:px-8 py-3 transition-all duration-200 transform hover:scale-105 text-sm sm:text-base"
               >
                 {isGenerating ? (
                   <>
-                    <ChefHat className="w-4 h-4 mr-2 animate-spin" />
-                    Cooking up magic...
+                    <ChefHat className="w-4 h-4 mr-2 animate-spin flex-shrink-0" />
+                    <span className="truncate">Cooking up magic...</span>
                   </>
                 ) : (
                   <>
-                    <ChefHat className="w-4 h-4 mr-2" />
-                    Generate Recipe
+                    <ChefHat className="w-4 h-4 mr-2 flex-shrink-0" />
+                    <span>Generate Recipe</span>
                   </>
                 )}
               </Button>
             </div>
           </div>
           
+          {/* Status Messages */}
           {retryCount > 0 && !isNonRecipeError && (
             <div className="text-sm text-orange-600 bg-orange-50 p-3 rounded-lg">
               <p>Having trouble? The AI service is sometimes busy. Try the retry button or rephrase your request.</p>
@@ -376,66 +386,70 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
         </CardContent>
       </Card>
 
+      {/* Generated Recipe Display */}
       {currentRecipe && (
         <Card className="shadow-xl border-0 bg-white">
-          <CardHeader className="pb-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <CardTitle className="text-2xl text-gray-800 mb-2">
+          <CardHeader className="pb-4 px-4 sm:px-6">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-4">
+              <div className="flex-1 min-w-0">
+                <CardTitle className="text-xl sm:text-2xl text-gray-800 mb-2 break-words">
                   {currentRecipe.title}
                 </CardTitle>
                 <div className="flex flex-wrap gap-2">
-                  <Badge variant="secondary" className="bg-orange-100 text-orange-700">
-                    <Clock className="w-3 h-3 mr-1" />
-                    {currentRecipe.cooking_time}
+                  <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
+                    <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
+                    <span className="truncate">{currentRecipe.cooking_time}</span>
                   </Badge>
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700">
-                    <Users className="w-3 h-3 mr-1" />
-                    Serves {currentRecipe.serving_size}
+                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 text-xs">
+                    <Users className="w-3 h-3 mr-1 flex-shrink-0" />
+                    <span className="truncate">Serves {currentRecipe.serving_size}</span>
                   </Badge>
                 </div>
               </div>
               <Button
                 onClick={saveRecipe}
                 variant="outline"
-                className="border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300"
+                className="w-full sm:w-auto border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-sm flex-shrink-0"
               >
-                <Heart className="w-4 h-4 mr-2" />
+                <Heart className="w-4 h-4 mr-2 flex-shrink-0" />
                 Save Recipe
               </Button>
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-6">
+          <CardContent className="space-y-6 px-4 sm:px-6">
+            {/* Ingredients Section */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Ingredients</h3>
               <ul className="space-y-2">
                 {currentRecipe.ingredients.map((ingredient, index) => (
-                  <li key={index} className="flex items-center space-x-2">
-                    <div className="w-2 h-2 bg-orange-400 rounded-full"></div>
-                    <span className="text-gray-700">{ingredient}</span>
+                  <li key={index} className="flex items-start space-x-2">
+                    <div className="w-2 h-2 bg-orange-400 rounded-full mt-2 flex-shrink-0"></div>
+                    <span className="text-gray-700 text-sm sm:text-base break-words">{ingredient}</span>
                   </li>
                 ))}
               </ul>
             </div>
 
+            {/* Instructions Section */}
             <div>
               <h3 className="text-lg font-semibold text-gray-800 mb-3">Instructions</h3>
               <ol className="space-y-3">
                 {currentRecipe.instructions.map((step, index) => (
                   <li key={index} className="flex space-x-3">
-                    <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium">
+                    <span className="flex-shrink-0 w-6 h-6 bg-orange-500 text-white rounded-full flex items-center justify-center text-sm font-medium mt-0.5">
                       {index + 1}
                     </span>
-                    <span className="text-gray-700">{step}</span>
+                    <span className="text-gray-700 text-sm sm:text-base break-words flex-1">{step}</span>
                   </li>
                 ))}
               </ol>
             </div>
 
+            {/* Chef's Tips Section */}
             <div className="bg-orange-50 p-4 rounded-lg">
               <h3 className="text-lg font-semibold text-gray-800 mb-2">Chef's Tips</h3>
-              <p className="text-gray-700 text-sm">{currentRecipe.cooking_tips}</p>
+              <p className="text-gray-700 text-sm break-words">{currentRecipe.cooking_tips}</p>
             </div>
           </CardContent>
         </Card>
