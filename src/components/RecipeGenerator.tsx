@@ -280,20 +280,20 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 space-y-4 sm:space-y-6">
+    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 space-y-4 sm:space-y-6">
       {/* Header Section */}
       <div className="text-center space-y-1 sm:space-y-2 pt-2 sm:pt-4">
-        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent px-2">
+        <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
           What would you like to cook today?
         </h1>
-        <p className="text-gray-600 text-xs sm:text-sm md:text-base px-2">
+        <p className="text-gray-600 text-xs sm:text-sm md:text-base">
           Describe any dish and I'll create a personalized recipe just for you!
         </p>
       </div>
 
       {/* Recipe Request Card */}
-      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm mx-1 sm:mx-0">
-        <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6">
+      <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
+        <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
           <CardTitle className="flex items-center space-x-2 text-base sm:text-lg md:text-xl">
             <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
             <span>Recipe Request</span>
@@ -303,7 +303,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-4 md:px-6">
+        <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
           <Textarea
             placeholder="I want to make..."
             value={prompt}
@@ -389,8 +389,8 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
       {/* Generated Recipe Display */}
       {currentRecipe && (
-        <Card className="shadow-xl border-0 bg-white mx-1 sm:mx-0">
-          <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6">
+        <Card className="shadow-xl border-0 bg-white">
+          <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
             <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-start sm:gap-4">
               <div className="flex-1 min-w-0">
                 <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-800 mb-2 break-words leading-tight">
@@ -418,7 +418,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
+          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
             {/* Ingredients Section */}
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Ingredients</h3>

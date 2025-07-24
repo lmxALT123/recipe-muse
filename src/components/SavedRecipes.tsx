@@ -99,7 +99,7 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
 
   if (loading) {
     return (
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center py-8 sm:py-12">
           <div className="w-8 h-8 sm:w-12 sm:h-12 bg-orange-500 rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-gray-600 text-sm">Loading your recipes...</p>
@@ -110,13 +110,13 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
 
   if (savedRecipes.length === 0) {
     return (
-      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
+      <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
         <div className="text-center py-8 sm:py-12">
           <div className="w-16 h-16 sm:w-24 sm:h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ChefHat className="w-8 h-8 sm:w-12 sm:h-12 text-orange-400" />
           </div>
           <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-800 mb-2">No Saved Recipes Yet</h2>
-          <p className="text-gray-600 mb-6 text-xs sm:text-sm md:text-base px-4">
+          <p className="text-gray-600 mb-6 text-xs sm:text-sm md:text-base">
             Start generating recipes and save your favorites to build your personal cookbook!
           </p>
         </div>
@@ -125,7 +125,7 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6">
+    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
       {/* Header */}
       <div className="text-center space-y-1 sm:space-y-2 mb-6 sm:mb-8 pt-2 sm:pt-4">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -144,14 +144,14 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
           {savedRecipes.map((recipe) => (
             <Card 
               key={recipe.id}
-              className={`cursor-pointer transition-all duration-200 hover:shadow-lg mx-1 sm:mx-0 ${
+              className={`cursor-pointer transition-all duration-200 hover:shadow-lg ${
                 selectedRecipe?.id === recipe.id 
                   ? 'ring-2 ring-orange-500 shadow-lg' 
                   : 'hover:ring-1 hover:ring-orange-200'
               }`}
               onClick={() => setSelectedRecipe(recipe)}
             >
-              <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4 md:px-6">
+              <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6">
                 <div className="flex justify-between items-start gap-2 sm:gap-3">
                   <div className="flex-1 min-w-0">
                     <CardTitle className="text-sm sm:text-base md:text-lg text-gray-800 mb-2 break-words leading-tight">
@@ -181,7 +181,7 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0 px-3 sm:px-4 md:px-6">
+              <CardContent className="pt-0 px-4 sm:px-6">
                 <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 break-words leading-relaxed">
                   Original request: "{recipe.description}"
                 </p>
@@ -198,8 +198,8 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
           {selectedRecipe ? (
             <div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-800 lg:hidden mb-3 sm:mb-4">Recipe Details</h2>
-              <Card className="shadow-xl border-0 bg-white mx-1 sm:mx-0">
-                <CardHeader className="pb-3 sm:pb-4 px-3 sm:px-4 md:px-6">
+              <Card className="shadow-xl border-0 bg-white">
+                <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
                   <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-start sm:gap-4">
                     <div className="flex-1 min-w-0">
                       <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-800 mb-2 break-words leading-tight">
@@ -220,7 +220,7 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
                   </div>
                 </CardHeader>
 
-                <CardContent className="space-y-4 sm:space-y-6 px-3 sm:px-4 md:px-6">
+                <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
                   {/* Ingredients */}
                   <div>
                     <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Ingredients</h3>
@@ -260,8 +260,8 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
           ) : (
             <div>
               <h2 className="text-base sm:text-lg font-semibold text-gray-800 lg:hidden mb-3 sm:mb-4">Select a Recipe</h2>
-              <Card className="shadow-lg bg-gradient-to-br from-orange-50 to-amber-50 mx-1 sm:mx-0">
-                <CardContent className="text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
+              <Card className="shadow-lg bg-gradient-to-br from-orange-50 to-amber-50">
+                <CardContent className="text-center py-6 sm:py-8 md:py-12 px-4 sm:px-6">
                   <ChefHat className="w-8 h-8 sm:w-12 sm:h-12 md:w-16 md:h-16 text-orange-400 mx-auto mb-3 sm:mb-4" />
                   <h3 className="text-base sm:text-lg md:text-xl font-semibold text-gray-800 mb-1 sm:mb-2">
                     Select a Recipe
