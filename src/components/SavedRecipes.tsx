@@ -125,7 +125,7 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8">
+    <div className="w-full max-w-4xl mx-auto px-3 sm:px-4 md:px-6">
       {/* Header */}
       <div className="text-center space-y-1 sm:space-y-2 mb-6 sm:mb-8 pt-2 sm:pt-4">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -137,10 +137,10 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
       </div>
 
       {/* Mobile: Stack layout, Desktop: Side-by-side */}
-      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-4 sm:gap-6">
+      <div className="flex flex-col lg:grid lg:grid-cols-2 gap-3 sm:gap-4">
         {/* Recipe List */}
-        <div className="space-y-3 sm:space-y-4 order-2 lg:order-1">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-800 lg:hidden mb-3 sm:mb-4">Your Recipes</h2>
+        <div className="space-y-2 sm:space-y-3 order-2 lg:order-1">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 lg:hidden mb-2 sm:mb-3">Your Recipes</h2>
           {savedRecipes.map((recipe) => (
             <Card 
               key={recipe.id}
@@ -151,13 +151,13 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
               }`}
               onClick={() => setSelectedRecipe(recipe)}
             >
-              <CardHeader className="pb-2 sm:pb-3 px-4 sm:px-6">
-                <div className="flex justify-between items-start gap-2 sm:gap-3">
+              <CardHeader className="pb-2 px-3 sm:px-4">
+                <div className="flex justify-between items-start gap-2">
                   <div className="flex-1 min-w-0">
-                    <CardTitle className="text-sm sm:text-base md:text-lg text-gray-800 mb-2 break-words leading-tight">
+                    <CardTitle className="text-sm sm:text-base text-gray-800 mb-1 break-words leading-tight">
                       {recipe.title}
                     </CardTitle>
-                    <div className="flex flex-wrap gap-1 sm:gap-2">
+                    <div className="flex flex-wrap gap-1 mb-1">
                       <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
                         <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
                         <span className="truncate">{recipe.cooking_time}</span>
@@ -175,13 +175,13 @@ export const SavedRecipes = ({ user }: SavedRecipesProps) => {
                       e.stopPropagation();
                       deleteRecipe(recipe.id);
                     }}
-                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 flex-shrink-0 h-8 w-8 p-0"
+                    className="text-gray-400 hover:text-red-500 hover:bg-red-50 flex-shrink-0 h-7 w-7 p-0"
                   >
-                    <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <Trash2 className="w-3 h-3" />
                   </Button>
                 </div>
               </CardHeader>
-              <CardContent className="pt-0 px-4 sm:px-6">
+              <CardContent className="pt-0 px-3 sm:px-4">
                 <p className="text-xs sm:text-sm text-gray-600 line-clamp-2 break-words leading-relaxed">
                   Original request: "{recipe.description}"
                 </p>

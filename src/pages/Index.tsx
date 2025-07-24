@@ -66,7 +66,7 @@ const Index = () => {
         onViewChange={setCurrentView}
       />
       
-      <main className="w-full px-2 sm:px-4 py-4 sm:py-6 md:py-8">
+      <main className="w-full px-1 sm:px-2 py-3 sm:py-4">
         {currentView === 'generator' && <RecipeGenerator user={user} />}
         {currentView === 'saved' && <SavedRecipes user={user} />}
       </main>

@@ -280,7 +280,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 space-y-4 sm:space-y-6">
+    <div className="w-full max-w-2xl mx-auto px-3 sm:px-4 md:px-6 space-y-3 sm:space-y-4">
       {/* Header Section */}
       <div className="text-center space-y-1 sm:space-y-2 pt-2 sm:pt-4">
         <h1 className="text-xl sm:text-2xl md:text-3xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
@@ -293,43 +293,43 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
 
       {/* Recipe Request Card */}
       <Card className="shadow-lg border-0 bg-white/80 backdrop-blur-sm">
-        <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
-          <CardTitle className="flex items-center space-x-2 text-base sm:text-lg md:text-xl">
-            <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-orange-500 flex-shrink-0" />
+        <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4">
+          <CardTitle className="flex items-center space-x-2 text-sm sm:text-base md:text-lg">
+            <Sparkles className="w-4 h-4 text-orange-500 flex-shrink-0" />
             <span>Recipe Request</span>
           </CardTitle>
-          <CardDescription className="text-xs sm:text-sm md:text-base">
-            Be creative! Try "spicy chicken and pineapple curry" or "quick weeknight pasta"
+          <CardDescription className="text-xs sm:text-sm break-words">
+            Be creative! Try "spicy chicken curry" or "quick pasta"
           </CardDescription>
         </CardHeader>
         
-        <CardContent className="space-y-3 sm:space-y-4 px-4 sm:px-6">
+        <CardContent className="space-y-3 px-3 sm:px-4">
           <Textarea
             placeholder="I want to make..."
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            className="min-h-[70px] sm:min-h-[80px] md:min-h-[100px] text-sm sm:text-base md:text-lg resize-none"
+            className="min-h-[60px] sm:min-h-[70px] text-sm resize-none w-full"
           />
 
           {/* Cooking Time and Generate Button Section */}
-          <div className="space-y-3 sm:space-y-4">
+          <div className="space-y-3">
             {/* Cooking Time Preference */}
-            <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-2">
               <label className="text-xs sm:text-sm font-medium block">Cooking Time Preference</label>
               <div className="grid grid-cols-2 gap-2">
                 <Button
                   variant={cookingTime === 'normal' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('normal')}
-                  className={`text-xs sm:text-sm h-9 sm:h-10 ${
+                  className={`text-xs h-8 sm:h-9 px-2 ${
                     cookingTime === 'normal' ? 'bg-orange-500 hover:bg-orange-600' : ''
                   }`}
                 >
-                  Normal (15-30 min)
+                  Normal (15-30m)
                 </Button>
                 <Button
                   variant={cookingTime === 'long' ? 'default' : 'outline'}
                   onClick={() => setCookingTime('long')}
-                  className={`text-xs sm:text-sm h-9 sm:h-10 ${
+                  className={`text-xs h-8 sm:h-9 px-2 ${
                     cookingTime === 'long' ? 'bg-orange-500 hover:bg-orange-600' : ''
                   }`}
                 >
@@ -355,7 +355,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               <Button
                 onClick={() => generateRecipe(false)}
                 disabled={isGenerating || !prompt.trim()}
-                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold transition-all duration-200 text-xs sm:text-sm md:text-base h-10 sm:h-11"
+                className="w-full bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold transition-all duration-200 text-xs sm:text-sm h-9 sm:h-10"
               >
                 {isGenerating ? (
                   <>
@@ -390,13 +390,13 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
       {/* Generated Recipe Display */}
       {currentRecipe && (
         <Card className="shadow-xl border-0 bg-white">
-          <CardHeader className="pb-3 sm:pb-4 px-4 sm:px-6">
-            <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:justify-between sm:items-start sm:gap-4">
+          <CardHeader className="pb-2 sm:pb-3 px-3 sm:px-4">
+            <div className="space-y-3">
               <div className="flex-1 min-w-0">
-                <CardTitle className="text-lg sm:text-xl md:text-2xl text-gray-800 mb-2 break-words leading-tight">
+                <CardTitle className="text-base sm:text-lg md:text-xl text-gray-800 mb-2 break-words leading-tight">
                   {currentRecipe.title}
                 </CardTitle>
-                <div className="flex flex-wrap gap-1 sm:gap-2">
+                <div className="flex flex-wrap gap-1 sm:gap-2 mb-3">
                   <Badge variant="secondary" className="bg-orange-100 text-orange-700 text-xs">
                     <Clock className="w-3 h-3 mr-1 flex-shrink-0" />
                     <span className="truncate">{currentRecipe.cooking_time}</span>
@@ -410,7 +410,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
               <Button
                 onClick={saveRecipe}
                 variant="outline"
-                className="w-full sm:w-auto border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs sm:text-sm flex-shrink-0 h-9 sm:h-10"
+                className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:border-red-300 text-xs sm:text-sm h-8 sm:h-9"
               >
                 <Heart className="w-3 h-3 sm:w-4 sm:h-4 mr-2 flex-shrink-0" />
                 Save Recipe
@@ -418,7 +418,7 @@ export const RecipeGenerator = ({ user }: RecipeGeneratorProps) => {
             </div>
           </CardHeader>
 
-          <CardContent className="space-y-4 sm:space-y-6 px-4 sm:px-6">
+          <CardContent className="space-y-3 sm:space-y-4 px-3 sm:px-4">
             {/* Ingredients Section */}
             <div>
               <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-2 sm:mb-3">Ingredients</h3>
